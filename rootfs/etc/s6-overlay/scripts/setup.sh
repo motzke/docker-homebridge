@@ -144,6 +144,17 @@ if [ -e /homebridge/package.json ]; then
   fi
 fi
 
+# link plugins bundled in the image, overriding any registry version so the image's copy is always used
+for pluginDir in /opt/homebridge-plugins/*; do
+  [ -f "$pluginDir/package.json" ] || continue
+  pluginName="$(jq -r '.name // empty' "$pluginDir/package.json")"
+  [ -n "$pluginName" ] || continue
+  echo "Linking bundled plugin ${pluginName} from ${pluginDir}"
+  if packageJson="$(jq -rM --arg name "$pluginName" --arg spec "file:$pluginDir" '.dependencies[$name] = $spec' /homebridge/package.json)"; then
+    printf '%s' "$packageJson" > /homebridge/package.json
+  fi
+done
+
 
 # source the setup script
 if [ -f /opt/homebridge/source.sh ]; then
