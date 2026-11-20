@@ -86,17 +86,8 @@ RUN case "$(uname -m)" in \
   && apt-get clean \
   && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
 
-# Plugins bundled in the image; /homebridge is a volume, so setup.sh links them into it on every start
-# The SSH URL needs an ssh-agent with GitHub access forwarded into the build: docker build --ssh default
-ARG FRITZ_PLATFORM_GIT_URL=git@github.com:motzke/homebridge-fritz-platform.git
-ARG FRITZ_PLATFORM_GIT_REF=feature/homebridge2
-
-ADD ${FRITZ_PLATFORM_GIT_URL}#${FRITZ_PLATFORM_GIT_REF} /opt/homebridge-plugins/homebridge-fritz-platform
-
-RUN set -x \
-  && cd /opt/homebridge-plugins/homebridge-fritz-platform \
-  && npm ci --omit=dev --cache /tmp/npm-cache \
-  && rm -rf /tmp/npm-cache
+# Installed into /homebridge by setup.sh on every start; set empty to skip
+ENV FRITZ_PLATFORM_PLUGIN="git+ssh://git@github.com/motzke/homebridge-fritz-platform.git#feature/homebridge2"
 
 RUN HB_CONFIG_UI_X_VERSION=$(jq -r '.dependencies["homebridge-config-ui-x"]' /opt/homebridge/package.json) && \
   echo "Homebridge Docker Package Manifest\n\n" \

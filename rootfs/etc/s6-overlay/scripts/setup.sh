@@ -144,16 +144,13 @@ if [ -e /homebridge/package.json ]; then
   fi
 fi
 
-# link plugins bundled in the image, overriding any registry version so the image's copy is always used
-for pluginDir in /opt/homebridge-plugins/*; do
-  [ -f "$pluginDir/package.json" ] || continue
-  pluginName="$(jq -r '.name // empty' "$pluginDir/package.json")"
-  [ -n "$pluginName" ] || continue
-  echo "Linking bundled plugin ${pluginName} from ${pluginDir}"
-  if packageJson="$(jq -rM --arg name "$pluginName" --arg spec "file:$pluginDir" '.dependencies[$name] = $spec' /homebridge/package.json)"; then
+# install the fritz platform plugin from git, overriding any registry version
+if [ -n "$FRITZ_PLATFORM_PLUGIN" ]; then
+  echo "Adding @minguyen68/homebridge-fritz-platform from ${FRITZ_PLATFORM_PLUGIN}"
+  if packageJson="$(jq -rM --arg spec "$FRITZ_PLATFORM_PLUGIN" '.dependencies["@minguyen68/homebridge-fritz-platform"] = $spec' /homebridge/package.json)"; then
     printf '%s' "$packageJson" > /homebridge/package.json
   fi
-done
+fi
 
 
 # source the setup script

@@ -19,7 +19,7 @@ echo DOCKER_HOMEBRIDGE_VERSION ${DOCKER_HOMEBRIDGE_VERSION}
 echo BASE_IMAGE ${BASE_IMAGE}
 
 # Build Docker image
-docker build --ssh default -f ./Dockerfile \
+docker build -f ./Dockerfile \
   --build-arg HOMEBRIDGE_APT_PKG_VERSION=v${HOMEBRIDGE_APT_PKG_VERSION} \
   --build-arg HOMEBRIDGE_APT_PKG_FILE=v${HOMEBRIDGE_APT_PKG_FILE} \
   --build-arg FFMPEG_FOR_HOMEBRIDGE_VERSION=v${FFMPEG_FOR_HOMEBRIDGE_VERSION} \
